@@ -1,0 +1,25 @@
+message Problem {
+    required string title = 1;
+    required int32 id = 2;
+    required ProblemStatement probStat = 3;
+    required CompilingStrategy compStrat = 4;
+    required TestStrategy testStrat = 5;
+    optional WaveStrategy waveStrat = 6;
+}
+
+message ProblemStatement probStat{
+    // not sure if encoding html problem statement as string
+    optional string html = 1; 
+}
+
+message CompilingStrategy compStrat{
+    optional string html = 1;
+}
+
+message TestStrategy testStrat{
+    optional string html = 1;
+}
+
+message WaveStrategy waveStrat{
+    optional string html = 1;
+}
