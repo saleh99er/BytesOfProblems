@@ -1,3 +1,12 @@
+Bytes of Problems credits:
+		https://coolors.co/2f6690-3a7ca5-d9dcd6-16425b-81c3d7
+		https://fontawesome.com/icons/github?style=brands
+		https://html5up.net/
+
+
+
+Original Web page template credits
+
 Stellar by HTML5 UP
 html5up.net | @ajlkn
 Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
@@ -18,12 +27,6 @@ aj@lkn.io | @ajlkn
 
 
 Credits:
-
-	To format properly later but I owe credits to:
-		https://coolors.co/2f6690-3a7ca5-d9dcd6-16425b-81c3d7
-		https://fontawesome.com/icons/github?style=brands
-		https://html5up.net/
-
 
 	Demo Images:
 		Unsplash (unsplash.com)

@@ -29,18 +29,20 @@
 					<div id="main">
 
 						<!-- Content -->
-							<section id="integrated-ide" class="main">
+							<section id="integrated-ide">
 								<!-- Create the toolbar container -->
 								<div id="toolbar">
-									<button class="ql-compile">Compile</button>
-									<button class="ql-test">Test</button>
+									<button display: inline-block text-align:center>Compile</button>
+									<button display: inline-block text-align:center>Test</button>
 								</div>
 								
 								<!-- Create the editor container -->
-								<div id="editor">
-									<p>Hello World!</p>
-									<p>Some initial <strong>bold</strong> text</p>
-									<p><br></p>
+								<div id="editor" class ="main">
+									<p>module Magic(A,Y)</p>
+									<p>input A;</p>
+									<p>output Y;</p>
+									<p>assign Y &lt= A;</p>
+									<p>endmodule;</p>
 								</div>
 								
 								<!-- Include the Quill library -->
@@ -49,7 +51,16 @@
 								
 								<!-- Initialize Quill editor -->
 								<script>
-									var editor = new Quill('#editor', { theme: 'snow'});
+									var options = {
+										debug: 'info',
+										modules: {
+											toolbar: '#toolbar'
+										},
+										placeholder: 'Compose an epic...',
+										readOnly: false,
+										theme: 'snow'
+										};
+									var editor = new Quill('#editor', options);
 								</script>
 							</section>
 

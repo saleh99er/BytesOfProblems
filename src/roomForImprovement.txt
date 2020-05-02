@@ -1,0 +1,2 @@
+
+Utilize Quill modules for syntax highlighting https://quilljs.com/docs/modules/
