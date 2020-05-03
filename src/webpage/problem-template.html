@@ -9,197 +9,248 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 <html>
-	<head>
-		<title>Byte of Problems - Problem template </title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-		<!-- Include stylesheet for Quill, editor -->
-		<link href="assets/css/quill.snow.css" rel="stylesheet">
-	</head>
-	<body class="is-preload">
 
-		<!-- Wrapper -->
-			<div id="wrapper">
+<head>
+	<title>Byte of Problems - Problem template </title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	<!-- Include stylesheet for Quill, editor -->
+	<link href="assets/css/quill.snow.css" rel="stylesheet">
+</head>
 
-				<!-- Header -->
-					<header id="header">
-						<h1>Problem 0: Problem Title</h1>
-						<p>For this problem you will implement a buffer that forwards input A to output Y. Both A and Y are 1 input</p>
-						<p>So if A = 1, Y =1, and if A = 0, Y = 0</p>
-					</header>
+<body class="is-preload">
 
-					<script type=text/plain id="golden_verilog">
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<h1>Problem 0: Problem Title</h1>
+			<p>For this problem you will implement a buffer that forwards input A to output Y. Both A and Y are 1 input
+			</p>
+			<p>So if A = 1, Y =1, and if A = 0, Y = 0</p>
+		</header>
+
+		<script type=text/plain id="golden_verilog">
 						module Magic(input A, output Y);
 							assign Y = A;
 						endmodule
 					</script>
 
-				<!-- Main -->
-					<div id="main">
+		<!-- Main -->
+		<div id="main">
 
-						<!-- Content -->
-							<section id="integrated-ide">
-								<!-- Create the toolbar container -->
-								<div id="toolbar">
-									<button display: inline-block text-align:center id="compileButton">Compile</button>
-									<button display: inline-block text-align:center id="test">Test</button>
-									<button display: inline-block text-align:center id="generateBlockButton">generate diagram</button>
-								</div>
-								
-								<!-- Create the editor container -->
-								<div id="editor" class ="main">
-									<!-- Insert initial module info here -->
-									<p>module Magic(</p>
-									<p>input A,</p>
-									<p>output Y);</p>
-									<p>assign Y = A;</p>
-									<p>endmodule</p>
-									
-								</div>
+			<!-- Content -->
+			<section id="integrated-ide">
+				<!-- Create the toolbar container -->
+				<div id="toolbar">
+					<button display: inline-block text-align:center id="compileButton">Compile</button>
+					<button display: inline-block text-align:center id="testButton">Test</button>
+					<button display: inline-block text-align:center id="generateBlockButton">generate diagram</button>
+				</div>
 
-								<!-- console of yosysjs -->
-								<div id="console_output" display="block">
-									<textarea id="c_output" style="width: 100%; height: 400px; color:white; background-color: rgb(20, 20, 60)"></textarea>
-								</div>
-								<!-- <div>
+				<!-- Create the editor container -->
+				<div id="editor" class="main">
+					<!-- Insert initial module info here -->
+					<p>module Magic(</p>
+					<p>input A,</p>
+					<p>output Y);</p>
+					<p>assign Y = A;</p>
+					<p>endmodule</p>
+
+				</div>
+
+				<!-- console of yosysjs -->
+				<div id="console_output" display="block">
+					<textarea id="c_output"
+						style="width: 100%; height: 400px; color:white; background-color: rgb(20, 20, 60)"></textarea>
+				</div>
+				<!-- <div>
 									<input id="command" type="textarea" onkeydown="history(event)"></input>
 								</div> -->
-								<div id="block_diagram_div">
-									<svg width="50" height="50"></svg>
-								</div>
+				<div id="block_diagram_div">
+					<svg width="50" height="50"></svg>
+				</div>
+				<div id="wave_div">
+				</div>
 
-								<!-- Include the Quill library -->
-								<!-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"> -->
-								<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> <!--script for integrated text editor in web app-->
-								<script type="text/javascript" src="assets/js/yosysjs.js"></script> <!--script for verilog rtl framework -->
-								<!-- Initialize Quill editor -->
-								<script>
-									var compiled = false;
+				<!-- Include the Quill library -->
+				<!--script for integrated text editor in web app-->
+				<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+				
+				<!-- YosysJS and WaveDrom, used to provide Verilog 2005 framework for developing, testing, and debugging -->
+				<script type="text/javascript" src="assets/js/yosysjs.js"></script>
+				<script src="http://wavedrom.com/skins/default.js" type="text/javascript"></script> 
+				<script src="http://wavedrom.com/WaveDrom.js" type="text/javascript"></script>
 
-									function print_output(text) {
-										var el = document.getElementById('c_output');
-										el.value += text + "\n";
-									}
+				<!--script for verilog rtl framework -->
+				
+				<script>
+					// start of helper functions for yosysjs / misc functionality --------------------
 
-									function history(ev) {
-										if (ev.keyCode == 38) {
-											el = document.getElementById('command');
-											if (history_index == history_log.length)
-												history_bak = el.value
-											if (history_index > 0)
-												el.value = history_log[--history_index];
-										}
-										if (ev.keyCode == 40) {
-											if (history_index < history_log.length) {
-												el = document.getElementById('command');
-												if (++history_index < history_log.length)
-													el.value = history_log[history_index];
-												else
-													el.value = history_bak;
-											}
-										}
-									}
+					function print_output(text) {
+						var el = document.getElementById('c_output');
+						el.value += text + "\n";
+					}
 
-									function showDotFile(dotFileName){
-										var block_diagram_div = document.getElementById("block_diagram_div");
-										dot_text = ys.read_file(dotFileName);
-										svg_text = YosysJS.dot_to_svg(dot_text);
-										block_diagram_div.innerHTML = svg_text;
-										
-									}
+					function history(ev) {
+						if (ev.keyCode == 38) {
+							el = document.getElementById('command');
+							if (history_index == history_log.length)
+								history_bak = el.value
+							if (history_index > 0)
+								el.value = history_log[--history_index];
+						}
+						if (ev.keyCode == 40) {
+							if (history_index < history_log.length) {
+								el = document.getElementById('command');
+								if (++history_index < history_log.length)
+									el.value = history_log[history_index];
+								else
+									el.value = history_bak;
+							}
+						}
+					}
+
+					function showDotFile(dotFileName) {
+						var block_diagram_div = document.getElementById("block_diagram_div");
+						dot_text = ys.read_file(dotFileName);
+						svg_text = YosysJS.dot_to_svg(dot_text);
+						block_diagram_div.innerHTML = svg_text;
+					}
+
+					//helper function to rename signals in wave_data from signame to newname
+					function wsignal(wave_data, signame, newname) {
+						for (i = 0; i < wave_data["signal"].length; i++)
+							if (wave_data["signal"][i].name == signame) {
+								if (newname)
+									wave_data["signal"][i].name = newname;
+								return wave_data["signal"][i];
+							}
+						return {};
+					}
+
+					// helper function to parse Quill editor contents
+					function deltaToString(d) {
+						var i;
+						var accum_str = "";
+						var opElement = d["ops"][0];
+						//console.log("opElement" + opElement);
+						if (opElement["insert"]) {
+							var insertPortion = opElement["insert"]
+							console.log("extracted string from Delta fragment:" + insertPortion);
+							accum_str += insertPortion;
+						}
+						return accum_str;
+					}
+
+					// end of helper functions for yosysjs and misc functionality ============
+
+					
+					YosysJS.load_viz();
+					var ys = YosysJS.create("", function () { print_output(ys.print_buffer) });
+					ys.verbose = true;// Print all Yosys output messages to the iframe
+					ys.logprint = true;// Print all Yosys output messages to the JavaScript console
+					ys.echo = true; // Echo back commands
+					console.log("yosysjs init done");
+
+					<!--Initialize Quill editor-->
+					var options = {
+						debug: 'info',
+						modules: {
+							toolbar: '#toolbar',
+						},
+						font: 'code',
+						placeholder: 'Compose an epic...',
+						readOnly: false,
+						theme: 'snow'
+					};
+					var editor = new Quill('#editor', options);
+					console.log("quill init done");
+
+					// REVISE COMPILATION STRATEGY HERE AS NEEDED
+					// since I assume its a single verilog module project, I can  compile like so
+					function compile() {
+						var moduleDelta = editor.getContents();
+						var moduleString = deltaToString(moduleDelta);
+						console.log("Delta to string:" + moduleString);
+						ys.write_file("main.v", moduleString);
+						var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
+						output_text = ys.run(ysCommand);
+
+					}
+
+					//REVISE TESTING STRATEGY HERE AS NEEDED
+					// since I assume its a single verilog module that's combinational, I can test like so
+					function test() {
+						var waveform_div = document.getElementById("wave_div");
+						ys.write_file('golden_verilog.v', document.getElementById("golden_verilog").textContent);
+						ys.remove_file('wave.json');
+						compile();
+						ys.errmsg = '';
+						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten ref top miter; hierarchy -top miter; clean -purge; sat -set-init-undef -seq 8 -dump_json wave.json -show-ports');
+						wave_div = document.getElementById('wave_div');
+						wave_data = ys.read_file("wave.json");
+						if (wave_data) {
+							wave_data = JSON.parse(wave_data);
+							wave_data2 = {
+								"signal": [
+									{ name: 'clk', wave: 'P........' },
+									wsignal("trigger"),
+									{},
+									["Inputs", wsignal(wave_data, "in_reset", "reset"), wsignal(wave_data, "in_A", "A")],
+									{},
+									["Y Output", wsignal(wave_data, "gold_Y", "Ref"), wsignal(wave_data, "gate_Y", "UUT")],
+								],
+								"config": wave_data["config"]
+							};
+							wave_data2_str = JSON.stringify(wdata2);
+							var result = document.createElement("p");
+							result.innerHTML = 'your module failed to pass the test cases  <script type="WaveDrom">' + wave_data2 + ' <\/script>';
 
 
-									YosysJS.load_viz();
-									var ys = YosysJS.create("", function() {print_output(ys.print_buffer)});
-									ys.verbose = true;// Print all Yosys output messages to the iframe
-									ys.logprint = true;// Print all Yosys output messages to the JavaScript console
-									ys.echo = true; // Echo back commands
-									console.log("yosysjs init done");
+						}
 
-									var options = {
-										debug: 'info',
-										modules: {
-											toolbar: '#toolbar',
-										},
-										font: 'code',
-										placeholder: 'Compose an epic...',
-										readOnly: false,
-										theme: 'snow'
-										};
-									var editor = new Quill('#editor', options);
-									console.log("quill init done");
-									
-									// helper function to parse Quill editor contents
-									function deltaToString(d){
-										var i;
-										var accum_str = "";
-										var opElement = d["ops"][0];
-										//console.log("opElement" + opElement);
-										if(opElement["insert"]){
-											var insertPortion = opElement["insert"]
-											console.log("extracted string from Delta fragment:" + insertPortion);
-											accum_str += insertPortion;
-										}
-										return accum_str;
-									}
+					}
 
-									// REVISE COMPILATION STRATEGY HERE AS NEEDED
-									// since I assume its a single verilog module project, I can  compile like so
-									function compile(){
-										var moduleDelta = editor.getContents();
-										var moduleString = deltaToString(moduleDelta);
-										console.log("Delta to string:" + moduleString);
-										ys.write_file("main.v", moduleString);
-										var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
-										output_text = ys.run(ysCommand);
-										
-									}
+					var compileButton = document.getElementById("compileButton");
+					compileButton.onclick = function () { compile() };
+					var generateDiagram = document.getElementById("generateBlockButton");
+					generateDiagram.onclick = function () { showDotFile("show.dot") };
+					var testButton = document.getElementById("testButton");
+					testButton.onclick = function () { test() };
+				</script>
+			</section>
 
-									//REVISE TESTING STRATEGY HERE AS NEEDED
-									// since I assume its a single verilog module that's combinational, I can test like so
-									function test(){
-										ys.write_file('golden_verilog.v', document.getElementById("golden_verilog").textContent);
-										ys.remove_file('wave.json');
-										compile();
-										ys.errmsg = '';
-										ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten ref top miter; hierarchy -top miter; clean -purge')
-									}
+		</div>
 
-									var compileButton = document.getElementById("compileButton");
-									compileButton.onclick = function() {compile()};
-									var generateDiagram = document.getElementById("generateBlockButton");
-									generateDiagram.onclick = function() {showDotFile("show.dot")};
+		<!-- Footer -->
+		<footer id="footer">
+			<ul class="icons">
+				<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
+				<li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
+				<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
+				<li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+				<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
+			</ul>
+			</section>
+			<p class="copyright">&copy; Saleh Hassen. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+		</footer>
 
-								</script>
-							</section>
+	</div>
 
-					</div>
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
 
-				<!-- Footer -->
-					<footer id="footer">
-							<ul class="icons">
-								<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
-								<li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
-								<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
-								<li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
-								<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
-							</ul>
-						</section>
-						<p class="copyright">&copy; Saleh Hassen. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-					</footer>
+</body>
 
-			</div>
-
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-	</body>
 </html>
