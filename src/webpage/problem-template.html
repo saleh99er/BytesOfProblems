@@ -32,8 +32,9 @@
 							<section id="integrated-ide">
 								<!-- Create the toolbar container -->
 								<div id="toolbar">
-									<button display: inline-block text-align:center>Compile</button>
-									<button display: inline-block text-align:center>Test</button>
+									<button display: inline-block text-align:center onclick="compile()">Compile</button>
+									<button display: inline-block text-align:center onclick="test()">Test</button>
+									<button display: inline-block text-align:center onclick="console()">Console</button>
 								</div>
 								
 								<!-- Create the editor container -->
@@ -54,8 +55,9 @@
 									var options = {
 										debug: 'info',
 										modules: {
-											toolbar: '#toolbar'
+											toolbar: '#toolbar',
 										},
+										font: 'code',
 										placeholder: 'Compose an epic...',
 										readOnly: false,
 										theme: 'snow'
@@ -76,13 +78,14 @@
 								<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
 							</ul>
 						</section>
-						<p class="copyright">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+						<p class="copyright">&copy; Saleh Hassen. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 
 			</div>
 
 		<!-- Scripts -->
-			<script src="assets/js/problem.js"></script>
+			<script src="assets/js/problem.js"></script> <!--scripts for misc -->
+			<script type="text/javascript" src="assets/js/yosysjs.js"></script> <!--script for verilog rtl framework -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.scrollex.min.js"></script>
 			<script src="assets/js/jquery.scrolly.min.js"></script>
