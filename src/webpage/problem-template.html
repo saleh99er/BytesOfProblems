@@ -32,22 +32,25 @@
 							<section id="integrated-ide">
 								<!-- Create the toolbar container -->
 								<div id="toolbar">
-									<button display: inline-block text-align:center id="compile">Compile</button>
+									<button display: inline-block text-align:center id="compileButton">Compile</button>
 									<button display: inline-block text-align:center id="test">Test</button>
+									<button display: inline-block text-align:center id="generateBlockButton">generate diagram</button>
 								</div>
 								
 								<!-- Create the editor container -->
 								<div id="editor" class ="main">
-									<p>module Magic(A,Y)</p>
-									<p>input A;</p>
-									<p>output Y;</p>
-									<p>assign Y &lt= A;</p>
-									<p>endmodule;</p>
+									<!-- Insert initial module info here -->
+									<p>module Magic(</p>
+									<p>input A,</p>
+									<p>output Y);</p>
+									<p>assign Y = A;</p>
+									<p>endmodule</p>
+									
 								</div>
 
 								<!-- console of yosysjs -->
 								<div id="console_output" display="block">
-									<iframe id="ys_iframe" style="width: 100%;"></iframe>
+									<textarea id="c_output" style="width: 100%; height: 400px; color:white; background-color: rgb(20, 20, 60)"></textarea>
 								</div>
 								<div>
 									<input id="command" type="textarea" onkeydown="history(event)"></input>
@@ -58,12 +61,10 @@
 								<script type="text/javascript" src="assets/js/yosysjs.js"></script> <!--script for verilog rtl framework -->
 								<!-- Initialize Quill editor -->
 								<script>
-									YosysJS.load_viz();
-									var ys = YosysJS.create("ys_iframe");
-									ys.verbose = true;// Print all Yosys output messages to the iframe
-									ys.logprint = true;// Print all Yosys output messages to the JavaScript console
-									ys.echo = true; // Echo back commands
-									console.log("yosysjs init done");
+									function print_output(text) {
+										var el = document.getElementById('c_output');
+										el.value += text + "\n";
+									}
 
 									function history(ev) {
 										if (ev.keyCode == 38) {
@@ -84,6 +85,14 @@
 										}
 									}
 
+
+									YosysJS.load_viz();
+									var ys = YosysJS.create("", function() {print_output(ys.print_buffer)});
+									ys.verbose = true;// Print all Yosys output messages to the iframe
+									ys.logprint = true;// Print all Yosys output messages to the JavaScript console
+									ys.echo = true; // Echo back commands
+									console.log("yosysjs init done");
+
 									var options = {
 										debug: 'info',
 										modules: {
@@ -97,7 +106,30 @@
 									var editor = new Quill('#editor', options);
 									console.log("quill init done");
 
-									
+									function deltaToString(d){
+										var i;
+										var accum_str = "";
+										var opElement = d["ops"][0];
+										//console.log("opElement" + opElement);
+										if(opElement["insert"]){
+											var insertPortion = opElement["insert"]
+											console.log("extracted string from Delta fragment:" + insertPortion);
+											accum_str += insertPortion;
+										}
+										return accum_str;
+									}
+
+									function compile(){
+										var moduleDelta = editor.getContents();
+										var moduleString = deltaToString(moduleDelta);
+										console.log("Delta to string:" + moduleString);
+										ys.write_file("main.v", moduleString);
+										var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n show \n"
+										output_text = ys.run(ysCommand);
+									}
+
+									var compileButton = document.getElementById("compileButton")
+									compileButton.onclick = function() {compile()};
 
 								</script>
 							</section>
