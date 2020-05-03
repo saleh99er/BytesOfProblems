@@ -35,7 +35,7 @@
 		</header>
 
 		<script type=text/plain id="golden_verilog">
-						module golden(input A, input B, input S output Y);
+						module golden(input A, input B, input S, output Y);
 							assign Y = (A && !S) || (B && S);
 						endmodule
 					</script>
@@ -203,7 +203,7 @@
 						wave_div = document.getElementById('wave_div');
 						var wave_data = ys.read_file("wave.json");
 						if(ys.errmsg){
-
+							console.warn("error occurred");
 						}
 						if (wave_data) {
 							var wave_data_json = JSON.parse(wave_data);
