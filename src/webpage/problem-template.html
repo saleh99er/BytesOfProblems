@@ -34,7 +34,6 @@
 								<div id="toolbar">
 									<button display: inline-block text-align:center id="compile">Compile</button>
 									<button display: inline-block text-align:center id="test">Test</button>
-									<button display: inline-block text-align:center id="console">Console</button>
 								</div>
 								
 								<!-- Create the editor container -->
@@ -46,14 +45,45 @@
 									<p>endmodule;</p>
 								</div>
 
-								<iframe id="ys_iframe" style="width: 100%;"></iframe>
-								
+								<!-- console of yosysjs -->
+								<div id="console_output" display="block">
+									<iframe id="ys_iframe" style="width: 100%;"></iframe>
+								</div>
+								<div>
+									<input id="command" type="textarea" onkeydown="history(event)"></input>
+								</div>
 								<!-- Include the Quill library -->
 								<!-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"> -->
 								<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> <!--script for integrated text editor in web app-->
 								<script type="text/javascript" src="assets/js/yosysjs.js"></script> <!--script for verilog rtl framework -->
 								<!-- Initialize Quill editor -->
 								<script>
+									YosysJS.load_viz();
+									var ys = YosysJS.create("ys_iframe");
+									ys.verbose = true;// Print all Yosys output messages to the iframe
+									ys.logprint = true;// Print all Yosys output messages to the JavaScript console
+									ys.echo = true; // Echo back commands
+									console.log("yosysjs init done");
+
+									function history(ev) {
+										if (ev.keyCode == 38) {
+											el = document.getElementById('command');
+											if (history_index == history_log.length)
+												history_bak = el.value
+											if (history_index > 0)
+												el.value = history_log[--history_index];
+										}
+										if (ev.keyCode == 40) {
+											if (history_index < history_log.length) {
+												el = document.getElementById('command');
+												if (++history_index < history_log.length)
+													el.value = history_log[history_index];
+												else
+													el.value = history_bak;
+											}
+										}
+									}
+
 									var options = {
 										debug: 'info',
 										modules: {
@@ -67,12 +97,7 @@
 									var editor = new Quill('#editor', options);
 									console.log("quill init done");
 
-									YosysJS.load_viz();
-									var ys = YosysJS.create();
-									ys.verbose = true;// Print all Yosys output messages to the iframe
-									ys.logprint = true;// Print all Yosys output messages to the JavaScript console
-									ys.echo = true; // Echo back commands
-									console.log("yosysjs init done");
+									
 
 								</script>
 							</section>
