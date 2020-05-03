@@ -177,10 +177,16 @@
 					function compile() {
 						var moduleDelta = editor.getContents();
 						var moduleString = deltaToString(moduleDelta);
+						var waveform_div = document.getElementById("wave_div");
+						waveform_div.innerHTML = "";
 						console.log("Delta to string:" + moduleString);
+						ys.errmsg = "";
 						ys.write_file("main.v", moduleString);
 						var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
 						output_text = ys.run(ysCommand);
+						if(ys.errmsg != ""){
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s): " + ys.errmsg;
+						}
 
 					}
 
@@ -188,6 +194,7 @@
 					// since I assume its a single verilog module that's combinational, I can test like so
 					function test() {
 						var waveform_div = document.getElementById("wave_div");
+						waveform_div.innerHTML = "";
 						ys.write_file('golden_verilog.v', document.getElementById("golden_verilog").textContent);
 						ys.remove_file('wave.json');
 						compile();
