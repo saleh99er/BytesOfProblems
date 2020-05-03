@@ -35,7 +35,7 @@
 		</header>
 
 		<script type=text/plain id="golden_verilog">
-						module Magic(input A, output Y);
+						module golden(input A, output Y);
 							assign Y = A;
 						endmodule
 					</script>
@@ -55,7 +55,7 @@
 				<!-- Create the editor container -->
 				<div id="editor" class="main">
 					<!-- Insert initial module info here -->
-					<p>module Magic(</p>
+					<p>module main(</p>
 					<p>input A,</p>
 					<p>output Y);</p>
 					<p>assign Y = A;</p>
@@ -149,7 +149,7 @@
 
 					// end of helper functions for yosysjs and misc functionality ============
 
-					
+					// Initialize YosysJS
 					YosysJS.load_viz();
 					var ys = YosysJS.create("", function () { print_output(ys.print_buffer) });
 					ys.verbose = true;// Print all Yosys output messages to the iframe
@@ -157,7 +157,7 @@
 					ys.echo = true; // Echo back commands
 					console.log("yosysjs init done");
 
-					<!--Initialize Quill editor-->
+					// Initialize Quill editor
 					var options = {
 						debug: 'info',
 						modules: {
@@ -191,27 +191,34 @@
 						ys.remove_file('wave.json');
 						compile();
 						ys.errmsg = '';
-						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten ref top miter; hierarchy -top miter; clean -purge; sat -set-init-undef -seq 8 -dump_json wave.json -show-ports');
+						ys.run('design -reset; read_verilog main.v; proc; hierarchy -top main; read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -max 10 -dump_json wave.json -show-ports -prove trigger 0 miter');
 						wave_div = document.getElementById('wave_div');
-						wave_data = ys.read_file("wave.json");
+						var wave_data = ys.read_file("wave.json");
+						if(ys.errmsg){
+
+						}
 						if (wave_data) {
-							wave_data = JSON.parse(wave_data);
-							wave_data2 = {
+							var wave_data_json = JSON.parse(wave_data);
+							var wave_data2 = {
 								"signal": [
 									{ name: 'clk', wave: 'P........' },
-									wsignal("trigger"),
+									wsignal(wave_data_json, "trigger"),
 									{},
-									["Inputs", wsignal(wave_data, "in_reset", "reset"), wsignal(wave_data, "in_A", "A")],
+									["Inputs", wsignal(wave_data_json, "in_reset", "reset"), wsignal(wave_data_json, "in_A", "A")],
 									{},
-									["Y Output", wsignal(wave_data, "gold_Y", "Ref"), wsignal(wave_data, "gate_Y", "UUT")],
+									["Y Output", wsignal(wave_data_json, "gold_Y", "Ref"), wsignal(wave_data_json, "gate_Y", "UUT")],
 								],
-								"config": wave_data["config"]
+								"config": wave_data_json["config"]
 							};
-							wave_data2_str = JSON.stringify(wdata2);
+							wave_data2_str = JSON.stringify(wave_data2);
 							var result = document.createElement("p");
-							result.innerHTML = 'your module failed to pass the test cases  <script type="WaveDrom">' + wave_data2 + ' <\/script>';
-
-
+							result.innerHTML = 'your module failed to pass the test cases<\/p>' + '<script type="WaveDrom">' + wave_data2_str + ' <\/script>';
+							waveform_div.appendChild(result);
+						}
+						else {
+							var result = document.createElement("p");
+							result.innerHTML = 'your module passed the test cases</p>';
+							waveform_div.appendChild(result);
 						}
 
 					}
