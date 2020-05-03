@@ -7,7 +7,7 @@ Hack @ Home project - Web app to do Verilog RTL exercises.
 
 You can access the website live on https://saleh99er.github.io/BytesOfProblems/ or run it locally on your machine
 
-
+Long term domain name is https://bytesofproblems.com (not transitioning now so the website is accessible for now without interruption).
 
 ### Installation (Machine local instructions)
 
