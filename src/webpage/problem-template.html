@@ -192,11 +192,16 @@
 						ys.remove_file('wave.json');
 						compile();
 						ys.errmsg = '';
-						ys.run('design -reset; read_verilog main.v; proc; hierarchy -top main; read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -max 10 -dump_json wave.json -show-ports -prove trigger 0 miter');
+						ys.run('design -reset; read_verilog main.v; proc; hierarchy -top main;');
+						if(ys.errmsg != ''){
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s), please get your project to compile first <p>";
+							return;
+						}
+						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -max 10 -dump_json wave.json -show-ports -prove trigger 0 miter');
 						wave_div = document.getElementById('wave_div');
 						var wave_data = ys.read_file("wave.json");
 						if(ys.errmsg){
-
+							console.warn("error occurred");
 						}
 						if (wave_data) {
 							var wave_data_json = JSON.parse(wave_data);
