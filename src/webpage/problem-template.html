@@ -52,15 +52,21 @@
 								<div id="console_output" display="block">
 									<textarea id="c_output" style="width: 100%; height: 400px; color:white; background-color: rgb(20, 20, 60)"></textarea>
 								</div>
-								<div>
+								<!-- <div>
 									<input id="command" type="textarea" onkeydown="history(event)"></input>
+								</div> -->
+								<div id="block_diagram_div">
+									<svg width="50" height="50"></svg>
 								</div>
+
 								<!-- Include the Quill library -->
 								<!-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"> -->
 								<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> <!--script for integrated text editor in web app-->
 								<script type="text/javascript" src="assets/js/yosysjs.js"></script> <!--script for verilog rtl framework -->
 								<!-- Initialize Quill editor -->
 								<script>
+									var compiled = false;
+
 									function print_output(text) {
 										var el = document.getElementById('c_output');
 										el.value += text + "\n";
@@ -83,6 +89,14 @@
 													el.value = history_bak;
 											}
 										}
+									}
+
+									function showDotFile(dotFileName){
+										var block_diagram_div = document.getElementById("block_diagram_div");
+										dot_text = ys.read_file(dotFileName);
+										svg_text = YosysJS.dot_to_svg(dot_text);
+										block_diagram_div.innerHTML = svg_text;
+										
 									}
 
 
@@ -126,10 +140,13 @@
 										ys.write_file("main.v", moduleString);
 										var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n show \n"
 										output_text = ys.run(ysCommand);
+										
 									}
 
-									var compileButton = document.getElementById("compileButton")
+									var compileButton = document.getElementById("compileButton");
 									compileButton.onclick = function() {compile()};
+									var generateDiagram = document.getElementById("generateBlockButton");
+									generateDiagram.onclick = function() {showDotFile("show.dot")};
 
 								</script>
 							</section>
