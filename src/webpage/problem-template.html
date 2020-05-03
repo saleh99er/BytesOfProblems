@@ -1,5 +1,9 @@
 <!DOCTYPE HTML>
 <!--
+	Bytes of Problems by Saleh Hassen
+	bytesofproblems.com | sih28@cornell.edu
+	===================
+	HTML+CSS+JS Template
 	Stellar by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
@@ -21,9 +25,16 @@
 
 				<!-- Header -->
 					<header id="header">
-						<h1>Problem template</h1>
-						<p>If your an end-user, you shouldn't be seeing this, oops</p>
+						<h1>Problem 0: Problem Title</h1>
+						<p>For this problem you will implement a buffer that forwards input A to output Y. Both A and Y are 1 input</p>
+						<p>So if A = 1, Y =1, and if A = 0, Y = 0</p>
 					</header>
+
+					<script type=text/plain id="golden_verilog">
+						module Magic(input A, output Y);
+							assign Y = A;
+						endmodule
+					</script>
 
 				<!-- Main -->
 					<div id="main">
@@ -119,7 +130,8 @@
 										};
 									var editor = new Quill('#editor', options);
 									console.log("quill init done");
-
+									
+									// helper function to parse Quill editor contents
 									function deltaToString(d){
 										var i;
 										var accum_str = "";
@@ -133,14 +145,26 @@
 										return accum_str;
 									}
 
+									// REVISE COMPILATION STRATEGY HERE AS NEEDED
+									// since I assume its a single verilog module project, I can  compile like so
 									function compile(){
 										var moduleDelta = editor.getContents();
 										var moduleString = deltaToString(moduleDelta);
 										console.log("Delta to string:" + moduleString);
 										ys.write_file("main.v", moduleString);
-										var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n show \n"
+										var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
 										output_text = ys.run(ysCommand);
 										
+									}
+
+									//REVISE TESTING STRATEGY HERE AS NEEDED
+									// since I assume its a single verilog module that's combinational, I can test like so
+									function test(){
+										ys.write_file('golden_verilog.v', document.getElementById("golden_verilog").textContent);
+										ys.remove_file('wave.json');
+										compile();
+										ys.errmsg = '';
+										ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten ref top miter; hierarchy -top miter; clean -purge')
 									}
 
 									var compileButton = document.getElementById("compileButton");
