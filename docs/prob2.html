@@ -11,7 +11,7 @@
 <html>
 
 <head>
-	<title>Byte of Problems - Problem 1: 2-to-1 (1-bit) mux </title>
+	<title>Byte of Problems - Problem 2: Incrementing Counter </title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
@@ -29,19 +29,28 @@
 			<a class="active" href="index.html">Home</a>
 			<a href="index.html#first">Problems</a>
 			
-		  </div>
+		</div>
 
 		<!-- Header -->
 		<header id="header">
-			<h1>Problem 1: 2-to-1 1-bit mux </h1>
-			<p>For this problem you will implement a 2-to-1 1-bit mux. Given input A,B, and S; if S is low then A is assigned to Y, if S is high then B is assigned to Y. By assigned, I mean whatever value the former takes will be shown for the latter.
+			<h1> Problem 2: Incrementing Counter</h1>
+			<p>For this problem you need Y to output 0 when a high RESET signal is received (at a rising clock edge), otherwise if A is high, then for every rising clock edge you must increment the output of 4 bit counter Y. when both RESET and A are low, Y should remain unchanged. You may use the plus operator and conditionals on this problem.
 			</p>
-			<p>So if A = 1, B=0, S=1, then Y =1</p>
+			
 		</header>
 
 		<script type=text/plain id="golden_verilog">
-						module golden(input A, input B, input S, output Y);
-							assign Y = (A && !S) || (B && S);
+						module golden(input CLK, input A, input RESET, output reg[3:0] Y);
+							
+							always@(posedge CLK) begin
+								if(RESET) Y <= 0;
+								else if (A) begin
+								 Y <= Y+1;
+								end
+								else begin
+								 Y <= Y;
+								end 
+							end
 						endmodule
 					</script>
 
@@ -61,10 +70,10 @@
 				<div id="editor" class="main">
 					<!-- Insert initial module info here -->
 					<p>module main(</p>
+					<p>input CLK,</p>
 					<p>input A,</p>
-					<p>input B,</p>
-					<p>input S,</p>
-					<p>output Y);</p>
+					<p>input RESET,</p>
+					<p>output reg[3:0] Y);</p>
 					<p></p>
 					<p>endmodule</p>
 
@@ -208,10 +217,10 @@
 						ys.errmsg = '';
 						ys.run('design -reset; read_verilog main.v; proc; hierarchy -top main;');
 						if(ys.errmsg != ''){
-							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s), please get your project to compile first <p>";
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s), please get your project to compile first </p>";
 							return;
 						}
-						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -max 10 -dump_json wave.json -show-ports -prove trigger 0 miter');
+						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -seq -20 -dump_json wave.json -show-ports -prove trigger 0 miter');
 						wave_div = document.getElementById('wave_div');
 						var wave_data = ys.read_file("wave.json");
 						if(ys.errmsg){
@@ -224,7 +233,7 @@
 									{ name: 'clk', wave: 'P........' },
 									wsignal(wave_data_json, "trigger"),
 									{},
-									["Inputs", wsignal(wave_data_json, "in_A", "A"), wsignal(wave_data_json, "in_B", "B"), wsignal(wave_data_json, "in_S", "S")],
+									["Inputs", wsignal(wave_data_json, "in_CLK", "CLK"), wsignal(wave_data_json, "in_A", "A"), wsignal(wave_data_json, "in_RESET", "RESET")],
 									{},
 									["Y Output", wsignal(wave_data_json, "gold_Y", "Ref"), wsignal(wave_data_json, "main_Y", "UUT")],
 								],

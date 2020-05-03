@@ -27,7 +27,7 @@
 	<div id="wrapper">
 		<div class="topnav">
 			<a class="active" href="index.html">Home</a>
-			<a href="index.html#problems">Problems</a>
+			<a href="index.html#first">Problems</a>
 			
 		</div>
 
@@ -190,7 +190,7 @@
 						var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
 						output_text = ys.run(ysCommand);
 						if(ys.errmsg != ""){
-							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s): " + ys.errmsg;
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s): " + ys.errmsg + "</p>";
 						}
 
 					}
@@ -255,13 +255,14 @@
 
 		<!-- Footer -->
 		<footer id="footer">
-			<ul class="icons">
-				<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
-				<li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
-				<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
-				<li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
-				<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
-			</ul>
+			<section> <!--left side-->
+				
+			</section>
+			<section> <!--right side-->
+				<ul class="icons">
+					<li><a href="https://github.com/saleh99er" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+					<li><a href="https://www.linkedin.com/in/saleh-hassen/" class="icon brands fa-linkedin alt"><span class="label">LinkedIn</span></a></li>
+				</ul>
 			</section>
 			<p class="copyright">&copy; Saleh Hassen. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 		</footer>
