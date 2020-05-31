@@ -1,0 +1,289 @@
+<!DOCTYPE HTML>
+<!--
+	Bytes of Problems by Saleh Hassen
+	bytesofproblems.com | sih28@cornell.edu
+	===================
+	HTML+CSS+JS Template
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Byte of Problems - Problem 3: Full-bit adder </title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	<!-- Include stylesheet for Quill, editor -->
+	<link href="assets/css/quill.snow.css" rel="stylesheet">
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+		<div class="topnav">
+			<a class="active" href="index.html">Home</a>
+			<a href="index.html#first">Problems</a>
+			
+		  </div>
+
+		<!-- Header -->
+		<header id="header">
+			<h1>Problem 3: Full-bit adder </h1>
+			<p>For this problem we will implement a full-bit adder, given A, B, and C_in as input & S and C_out as output. </p>
+
+			<p>For those unfamiliar with a full-bit adder, imagine how we add with the decimal system. We have 2 terms per digit we would add and possibly a 3rd if the previous digits sum carries over. Same goes for binary numbers. </p>
+			<p> <img src=images/adder.png></p>
+			<p>To make this nontrivial, try to do this with just logic operators (no arithmetic operators)</p>
+		</header>
+
+		<script type=text/plain id="golden_verilog">
+						module golden(input A, input B, input C_in, output S, output C_out);
+							assign S =  (A^B^C_in);
+							assign C_out = (A & B) | (A & C_in) | (C_in & B);
+						endmodule
+					</script>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Content -->
+			<section id="integrated-ide">
+				<!-- Create the toolbar container -->
+				<div id="toolbar">
+					<button display: inline-block text-align:center id="compileButton">Compile</button>
+					<button display: inline-block text-align:center id="testButton">Test</button>
+					<button display: inline-block text-align:center id="generateBlockButton">generate diagram</button>
+				</div>
+
+				<!-- Create the editor container -->
+				<div id="editor" class="main">
+					<!-- Insert initial module info here -->
+					<p>module main(</p>
+					<p>input A,</p>
+					<p>input B,</p>
+					<p>input C_in,</p>
+					<p>output S,</p>
+					<p>output C_out);</p>
+					<p></p>
+					<p>endmodule</p>
+
+				</div>
+
+				<!-- console of yosysjs -->
+				<div id="console_output" display="block">
+					<textarea id="c_output"
+						style="width: 100%; height: 400px; color:white; background-color: rgb(20, 20, 60)"></textarea>
+				</div>
+				<!-- <div>
+									<input id="command" type="textarea" onkeydown="history(event)"></input>
+								</div> -->
+				<div id="block_diagram_div">
+					<svg width="50" height="50"></svg>
+				</div>
+				<div id="wave_div">
+				</div>
+
+				<!-- Include the Quill library -->
+				<!--script for integrated text editor in web app-->
+				<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+				
+				<!-- YosysJS and WaveDrom, used to provide Verilog 2005 framework for developing, testing, and debugging -->
+				<script type="text/javascript" src="assets/js/yosysjs.js"></script>
+				<script src="http://wavedrom.com/skins/default.js" type="text/javascript"></script> 
+				<script src="http://wavedrom.com/WaveDrom.js" type="text/javascript"></script>
+				<style type="text/css">div.wavedromMenu{position:fixed;border:solid 1pt#CCCCCC;background-color:white;box-shadow:0px 10px 20px #808080;cursor:default;margin:0px;padding:0px;}div.wavedromMenu>ul{margin:0px;padding:0px;}div.wavedromMenu>ul>li{padding:2px 10px;list-style:none;}div.wavedromMenu>ul>li:hover{background-color:#b5d5ff;}</style>
+
+				<!--script for verilog rtl framework -->
+				
+				<script>
+					// start of helper functions for yosysjs / misc functionality --------------------
+
+					function print_output(text) {
+						var el = document.getElementById('c_output');
+						el.value += text + "\n";
+					}
+
+					function history(ev) {
+						if (ev.keyCode == 38) {
+							el = document.getElementById('command');
+							if (history_index == history_log.length)
+								history_bak = el.value
+							if (history_index > 0)
+								el.value = history_log[--history_index];
+						}
+						if (ev.keyCode == 40) {
+							if (history_index < history_log.length) {
+								el = document.getElementById('command');
+								if (++history_index < history_log.length)
+									el.value = history_log[history_index];
+								else
+									el.value = history_bak;
+							}
+						}
+					}
+
+					function showDotFile(dotFileName) {
+						var block_diagram_div = document.getElementById("block_diagram_div");
+						dot_text = ys.read_file(dotFileName);
+						svg_text = YosysJS.dot_to_svg(dot_text);
+						block_diagram_div.innerHTML = svg_text;
+					}
+
+					//helper function to rename signals in wave_data from signame to newname
+					function wsignal(wave_data, signame, newname) {
+						for (i = 0; i < wave_data["signal"].length; i++)
+							if (wave_data["signal"][i].name == signame) {
+								if (newname)
+									wave_data["signal"][i].name = newname;
+								return wave_data["signal"][i];
+							}
+						return {};
+					}
+
+					// helper function to parse Quill editor contents
+					function deltaToString(d) {
+						var i;
+						var accum_str = "";
+						var opElement = d["ops"][0];
+						//console.log("opElement" + opElement);
+						if (opElement["insert"]) {
+							var insertPortion = opElement["insert"]
+							console.log("extracted string from Delta fragment:" + insertPortion);
+							accum_str += insertPortion;
+						}
+						return accum_str;
+					}
+
+					// end of helper functions for yosysjs and misc functionality ============
+
+					// Initialize YosysJS
+					YosysJS.load_viz();
+					var ys = YosysJS.create("", function () { print_output(ys.print_buffer) });
+					ys.verbose = true;// Print all Yosys output messages to the iframe
+					ys.logprint = true;// Print all Yosys output messages to the JavaScript console
+					ys.echo = true; // Echo back commands
+					console.log("yosysjs init done");
+
+					// Initialize Quill editor
+					var options = {
+						debug: 'info',
+						modules: {
+							toolbar: '#toolbar',
+						},
+						font: 'code',
+						placeholder: 'Compose an epic...',
+						readOnly: false,
+						theme: 'snow'
+					};
+					var editor = new Quill('#editor', options);
+					console.log("quill init done");
+
+					// REVISE COMPILATION STRATEGY HERE AS NEEDED
+					// since I assume its a single verilog module project, I can  compile like so
+					function compile() {
+						var moduleDelta = editor.getContents();
+						var moduleString = deltaToString(moduleDelta);
+						var waveform_div = document.getElementById("wave_div");
+						waveform_div.innerHTML = "";
+						console.log("Delta to string:" + moduleString);
+						ys.errmsg = "";
+						ys.write_file("main.v", moduleString);
+						var ysCommand = "# a simple yosys.js example. run \"script example.ys\". \n design -reset \n read_verilog main.v \n proc \n opt \n flatten \n hierarchy \n show \n"
+						output_text = ys.run(ysCommand);
+						if(ys.errmsg != ""){
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s): " + ys.errmsg + "</p>";
+						}
+
+					}
+
+					//REVISE TESTING STRATEGY HERE AS NEEDED
+					// since I assume its a single verilog module that's combinational, I can test like so
+					function test() {
+						var waveform_div = document.getElementById("wave_div");
+						waveform_div.innerHTML = "";
+						ys.write_file('golden_verilog.v', document.getElementById("golden_verilog").textContent);
+						ys.remove_file('wave.json');
+						compile();
+						ys.errmsg = '';
+						ys.run('design -reset; read_verilog main.v; proc; hierarchy -top main;');
+						if(ys.errmsg != ''){
+							waveform_div.innerHTML = "<p style=color:red> syntax issue with verilog file(s), please get your project to compile first <p>";
+							return;
+						}
+						ys.run('read_verilog golden_verilog.v; proc; miter -equiv -ignore_gold_x -make_outputs -flatten golden main miter; hierarchy -top miter; clean -purge; sat -max 10 -dump_json wave.json -show-ports -prove trigger 0 miter');
+						wave_div = document.getElementById('wave_div');
+						var wave_data = ys.read_file("wave.json");
+						if(ys.errmsg){
+							console.warn("error occurred");
+						}
+						if (wave_data) {
+							var wave_data_json = JSON.parse(wave_data);
+							var wave_data2 = {
+								"signal": [
+									{ name: 'clk', wave: 'P........' },
+									wsignal(wave_data_json, "trigger"),
+									{},
+									["Inputs", wsignal(wave_data_json, "in_A", "A"), wsignal(wave_data_json, "in_B", "B"), wsignal(wave_data_json, "in_C_in", "C_in")],
+									{},
+									["Outputs", wsignal(wave_data_json, "gold_S", "Ref_S"), wsignal(wave_data_json, "main_S", "UUT_S"), wsignal(wave_data_json, "gold_C_out", "Ref_C_out"), wsignal(wave_data_json, "main_C_out", "UUT_C_out")],
+								],
+								"config": wave_data_json["config"]
+							};
+							wave_data2_str = JSON.stringify(wave_data2);
+							var result = document.createElement("p");
+							result.innerHTML = 'your module failed to pass the test cases<\/p>' + '<script type="WaveDrom">' + wave_data2_str + ' <\/script>';
+							waveform_div.appendChild(result);
+						}
+						else {
+							var result = document.createElement("p");
+							result.innerHTML = 'your module passed the test cases</p>';
+							waveform_div.appendChild(result);
+							WaveDrom.ProcessAll();
+						}
+
+					}
+
+					var compileButton = document.getElementById("compileButton");
+					compileButton.onclick = function () { compile() };
+					var generateDiagram = document.getElementById("generateBlockButton");
+					generateDiagram.onclick = function () { showDotFile("show.dot") };
+					var testButton = document.getElementById("testButton");
+					testButton.onclick = function () { test() };
+				</script>
+			</section>
+
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<section> <!--left side-->
+				
+			</section>
+			<section> <!--right side-->
+				<ul class="icons">
+					<li><a href="https://github.com/saleh99er" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+					<li><a href="https://www.linkedin.com/in/saleh-hassen/" class="icon brands fa-linkedin alt"><span class="label">LinkedIn</span></a></li>
+				</ul>
+			</section>
+			<p class="copyright">&copy; Saleh Hassen. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

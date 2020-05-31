@@ -19,19 +19,17 @@ Open a terminal within that directory and navigate to the docs directory.
 
 Execute the following command
 
-```python3 -m http.server 8001```
+```python3 -m http.server <port number>```
 
-This will create a local web server at port 8001. 
+This will create a localhost web server at the port number you assigned, accesible through the device's browser  
 
-Open a web browser and enter in the webpage localhost:8001.
+Open a web browser and enter in the webpage ```128.0.0.1:<port number> ``` 
 
 You can now access the website and it's resources offline.
 
 ## Interacting with the interface
 
 You can edit each of the problem's modules within the Quill Window, the first black window on the webpage. All changes made will be acted upon once you press the `Compile` button. This will have YosysJS attempt to interpret your verilog module(s). If successful you can generate block diagrams of your module with the `generate diagram` button. To test your module against the solution press the `Test` button. All 3 button responses will be provided at the bottom-most black window. The middle blue window is console output provided directly from yosysjs that isn't working as desired (sorry).
-
-# 
 
 ## Deployment
 
@@ -45,16 +43,16 @@ Add additional notes about how to deploy this on a live system
 
 ## Authors
 
-Saleh Hassen (sih28@cornell.edu)
+Saleh Hassen
 
-* **YosysJS** - *Initial work* - [](http://www.clifford.at/yosys/nogit/YosysJS/snapshot/)
+## Acknowledgments
 
-<!-- See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project. -->
+* Initial Work - [YosysJS](http://www.clifford.at/yosys/nogit/YosysJS/snapshot/)
+
+* MLH for hosting this hackathon
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Acknowledgments
 
-* MLH for hosting this hackathon
